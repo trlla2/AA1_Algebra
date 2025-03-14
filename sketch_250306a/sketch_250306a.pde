@@ -48,3 +48,18 @@ float size_e[] = new float[num_e];
 void setup(){
   size(_widthSetup,_heightSetup); //ventana
 }
+
+void draw(){
+  // Clear Screen
+    background(0);
+  
+  // ----- pj
+  // set position pj
+  x_pj = pmouseX;
+  y_pj = pmouseY;
+  // draw
+  fill(0,255,0);
+  ellipse(x_pj,y_pj,width/20,height/20);   
+  
+  
+}
