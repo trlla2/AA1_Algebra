@@ -35,8 +35,11 @@ float alfa_m2;
 float alfa_eN;
 float alfa_eP;
 
+
+
 // PNJs (Enemigos)
-int num_e = 4; // numero de enemigos
+int num_e = 11; // numero de enemigos
+float alfa_enemy[] = new float[num_e];
 //position
 float x_e[] = new float [num_e];
 float y_e[] = new float [num_e];
@@ -55,8 +58,8 @@ void setup(){
   x_m2 = width/random(1,10);
   y_m2 = height/random(1,10);
   
-  alfa_m1 = random(0.001,0.1);
-  alfa_m2 = random(0.001,0.1);
+  alfa_m1 = random(0.001,0.01);
+  alfa_m2 = random(0.001,0.01);
   
   for(int i = 0; i < num_e; i++)
   {
@@ -64,9 +67,17 @@ void setup(){
     y_e[i] = height/random(1,10);
   }
   
-  alfa_eN = random(-0.001,-0.1);
-  alfa_eP = random(0.001,0.1);
-  
+  for(int i = 0; i < num_e; i++){ //iterar entre todos los pnj
+    
+    if(i < num_e / 2){ // velocidad del pnj (alfa entre 0 y 1)
+      alfa_enemy[i] = random(-0.001,-0.1); // persigue 
+      
+    }else if (i < 3 * num_e / 4) {
+      alfa_enemy[i] = random(0.01,0.001); //Huye
+    }else{
+      alfa_enemy[i] = random(0.01,0.001); //Huye
+    }
+  }
   
 }
 
@@ -88,6 +99,24 @@ void draw(){
   // Perseguir mascota 2
   x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
   y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * y_pj;
+  
+  // Perseguir de los enemigos
+   for(int i = 0; i < num_e; i++){ //iterar entre todos los pnj
+    if(i < num_e / 2){
+      // N/2 enemigos huyen del PJ
+      x_e[i] = (1 - alfa_enemy[i]) * x_e[i] + alfa_enemy[i] * x_pj;
+      y_e[i] = (1 - alfa_enemy[i]) * y_e[i] + alfa_enemy[i] * y_pj;
+      
+    }else if (i < 3 * num_e / 4) {
+      // N/4 enemigos persiguen al PNJ1
+      x_e[i] = (1 - alfa_enemy[i]) * x_e[i] + alfa_enemy[i] * x_m1;
+      y_e[i] = (1 - alfa_enemy[i]) * y_e[i] + alfa_enemy[i] * y_m1;
+    } else {
+      // N/4 enemigos persiguen al PNJ2
+      x_e[i] = (1 - alfa_enemy[i]) * x_e[i] + alfa_enemy[i] * x_m2;
+      y_e[i] = (1 - alfa_enemy[i]) * y_e[i] + alfa_enemy[i] * y_m2;
+    }
+  }
   
   // Pintar PNJ's
   fill(255,255,0);
