@@ -41,9 +41,6 @@ float y_e[] = new float [num_e];
 // size
 float size_e[] = new float[num_e];
 
-
-boolean colision = false;
-
 //------------------------ Funciotns
 
 void setup(){
@@ -123,6 +120,8 @@ void draw(){
   ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
   
   boolean colisionDetectada = false;
+  boolean colisionDetectada_m1 = false;
+  boolean colisionDetectada_m2 = false;
 
   for (int i = 0; i < num_e; i++) {
       fill(255,0,0);
@@ -130,18 +129,30 @@ void draw(){
   }
   
   for (int i = 0; i < num_e; i++) {
+    // Colisiones PJ con Enemys
       if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
           colisionDetectada = true;
           break; // Sale del bucle si hay una colisión
       }
+      // Colisiones m1 con Enemys
+      if (dist(x_e[i], y_e[i], x_m1, y_m1) < radio_enemy + size_m1) {
+          colisionDetectada_m1 = true;
+          break; // Sale del bucle si hay una colisión
+      }
+      // Colisiones m2 con Enemys
+      if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2) {
+          colisionDetectada_m2 = true;
+          break; // Sale del bucle si hay una colisión
+      }
   }
-  
-  
   
   if (colisionDetectada) {
       println("HAY COLISION");
+  }else if(colisionDetectada_m1){
+      println("HAY COLISION CON M1");
+  }else if(colisionDetectada_m2){
+      println("HAY COLISION CON M2");
   }else{
       println("NO HAY COLISION");
   }
-  
 }
