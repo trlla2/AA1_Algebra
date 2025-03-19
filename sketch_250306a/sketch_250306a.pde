@@ -12,23 +12,16 @@ float color_pj_r = 0;
 float color_pj_g = 0;
 float color_pj_b = 255;
 //size
-float size_pj = 20;
+float size_pj = 15;
 
 // PNJs (mascotas)
 
 //position
 float x_m1, y_m1, x_m2, y_m2;
 
-//color
-float color_m1_r = 0;
-float color_m1_g = 255;
-float color_m1_b = 0;
-
-float color_m2_r = 0;
-float color_m2_g = 255;
-float color_m2_b = 0;
 //size (los dos con el mismo size)
-float size_m = 10;
+float size_m1 = 11;
+float size_m2 = 13;
 
 float alfa_m1;
 float alfa_m2;
@@ -40,13 +33,16 @@ float alfa_eP;
 // PNJs (Enemigos)
 int num_e = 11; // numero de enemigos
 float alfa_enemy[] = new float[num_e];
+int radio_enemy;
 //position
 float x_e[] = new float [num_e];
 float y_e[] = new float [num_e];
-//color
 
 // size
 float size_e[] = new float[num_e];
+
+
+boolean colision = false;
 
 //------------------------ Funciotns
 
@@ -67,17 +63,19 @@ void setup(){
     y_e[i] = height/random(1,10);
   }
   
-  for(int i = 0; i < num_e; i++){ //iterar entre todos los pnj
-    
-    if(i < num_e / 2){ // velocidad del pnj (alfa entre 0 y 1)
-      alfa_enemy[i] = random(-0.001,-0.1); // persigue 
-      
-    }else if (i < 3 * num_e / 4) {
-      alfa_enemy[i] = random(0.01,0.001); //Huye
-    }else{
-      alfa_enemy[i] = random(0.01,0.001); //Huye
+  for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
+    if (i < num_e / 2) { 
+        alfa_enemy[i] = random(-0.01, -0.0001); 
+        
+    } else if (i < 3 * num_e / 4) { 
+        alfa_enemy[i] = random(0.01, 0.0001);
+        
+    } else { 
+        alfa_enemy[i] = random(0.01, 0.0001);
     }
   }
+  
+  radio_enemy = 12;
   
 }
 
@@ -87,11 +85,11 @@ void draw(){
   
   // ----- pj
   // set position pj
-  x_pj = pmouseX;
-  y_pj = pmouseY;
+  x_pj = mouseX;
+  y_pj = mouseY;
   // draw
   fill(0,255,0);
-  ellipse(x_pj,y_pj,width/20,height/20);  
+  ellipse(x_pj,y_pj,size_pj*2,size_pj*2);  
   
   // Perseguir mascota 1
   x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * x_pj;
@@ -120,14 +118,30 @@ void draw(){
   
   // Pintar PNJ's
   fill(255,255,0);
-  ellipse(x_m1,y_m1,width/25,height/25);
+  ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
   fill(90,255,200);
-  ellipse(x_m2,y_m2,width/20,height/20);
+  ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
   
-  for(int i = 0; i < num_e; i++)
-  {
-    fill(255,0,0);
-    ellipse(x_e[i],y_e[i],width/25,height/25);
+  boolean colisionDetectada = false;
+
+  for (int i = 0; i < num_e; i++) {
+      fill(255,0,0);
+      ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
+  }
+  
+  for (int i = 0; i < num_e; i++) {
+      if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
+          colisionDetectada = true;
+          break; // Sale del bucle si hay una colisión
+      }
+  }
+  
+  
+  
+  if (colisionDetectada) {
+      println("HAY COLISION");
+  }else{
+      println("NO HAY COLISION");
   }
   
 }
