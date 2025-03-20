@@ -47,15 +47,15 @@ float alfa_eP;
 
 
 // PNJs (Enemigos)
-int num_e = 11; // numero de enemigos
-float alfa_enemy[] = new float[num_e];
+int num_e; // numero de enemigos
+float alfa_enemy[];
 int radio_enemy;
 //position
-float x_e[] = new float [num_e];
-float y_e[] = new float [num_e];
+float x_e[];
+float y_e[];
 
 // size
-float size_e[] = new float[num_e];
+float size_e[];
 
 //------------------------ Funciotns
 
@@ -196,6 +196,14 @@ void draw(){
 // GAMEPLAY Functions
 
 void gameplayInitialize(){
+  // initialize arrays
+  
+  alfa_enemy = new float [num_e];
+  x_e = new float [num_e];
+  y_e = new float [num_e];
+  size_e = new float[num_e];
+  
+  
   x_m1 = width/random(1,10);//random position
   y_m1 = height/random(1,10);
   x_m2 = width/random(1,10);
