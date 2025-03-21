@@ -256,7 +256,7 @@ void gui(){
      .setSize(200,40)
      .setFont(font)
      .setFocus(true)
-     .setColor(color(255,0,0))
+     .setColor(color(255))
      .setText("5")
      ;  
 
