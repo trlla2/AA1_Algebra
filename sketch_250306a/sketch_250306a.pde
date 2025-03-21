@@ -34,6 +34,8 @@ float size_pj = 15;
 
 //position
 float x_m1, y_m1, x_m2, y_m2;
+int ofset_m1 = 50;
+int ofset_m2 = 50;
 
 //size (los dos con el mismo size)
 float size_m1 = 11;
@@ -44,6 +46,11 @@ float alfa_m2;
 float alfa_eN;
 float alfa_eP;
 
+
+boolean colisionDetectada = false;
+boolean colisionDetectada_m1 = false;
+boolean colisionDetectada_m2 = false;
+boolean colisionDetectada_m2_pj = false;
 
 
 // PNJs (Enemigos)
@@ -79,17 +86,7 @@ void setup(){
     y_e[i] = height/random(1,10);
   }
   
-  for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
-    if (i < num_e / 2) { 
-        alfa_enemy[i] = random(-0.01, -0.0001); 
-        
-    } else if (i < 3 * num_e / 4) { 
-        alfa_enemy[i] = random(0.01, 0.0001);
-        
-    } else { 
-        alfa_enemy[i] = random(0.01, 0.0001);
-    }
-  }
+  
   
   radio_enemy = 12;
   
@@ -119,12 +116,21 @@ void draw(){
       fill(0,255,0);
       ellipse(x_pj,y_pj,size_pj*2,size_pj*2);  
       
+      for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
+        if (i < num_e / 2) { 
+            alfa_enemy[i] = random(-0.01, -0.0001); 
+            
+        } else if (i < 3 * num_e / 4) { 
+            alfa_enemy[i] = random(0.01, 0.0001);
+            
+        } else { 
+            alfa_enemy[i] = random(0.01, 0.0001);
+        }
+      }
       // Perseguir mascota 1
-      x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * x_pj;
+      x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
       y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
-      // Perseguir mascota 2
-      x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
-      y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * y_pj;
+      
       
       // Perseguir de los enemigos
        for(int i = 0; i < num_e; i++){ //iterar entre todos los pnj
@@ -149,10 +155,6 @@ void draw(){
       ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
       fill(90,255,200);
       ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
-      
-      boolean colisionDetectada = false;
-      boolean colisionDetectada_m1 = false;
-      boolean colisionDetectada_m2 = false;
     
       for (int i = 0; i < num_e; i++) {
           fill(255,0,0);
@@ -165,27 +167,54 @@ void draw(){
               colisionDetectada = true;
               break; // Sale del bucle si hay una colisión
           }
+          else
+          {
+            colisionDetectada = false;
+          }
           // Colisiones m1 con Enemys
           if (dist(x_e[i], y_e[i], x_m1, y_m1) < radio_enemy + size_m1) {
               colisionDetectada_m1 = true;
               break; // Sale del bucle si hay una colisión
+          }
+          else
+          {
+            colisionDetectada_m1 = false;
           }
           // Colisiones m2 con Enemys
           if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2) {
               colisionDetectada_m2 = true;
               break; // Sale del bucle si hay una colisión
           }
+          else
+          {
+            colisionDetectada_m2 = false;
+          }
+      }
+      
+      if (dist(x_m2, y_m2, x_pj, y_pj) < size_m2 + size_pj)
+      {
+        colisionDetectada_m2_pj = true;
       }
       
       if (colisionDetectada) {
           println("HAY COLISION");
-      }else if(colisionDetectada_m1){
-          println("HAY COLISION CON M1");
-      }else if(colisionDetectada_m2){
-          println("HAY COLISION CON M2");
-      }else{
-          println("NO HAY COLISION");
       }
+      if(colisionDetectada_m1){
+          println("HAY COLISION CON M1");
+      }
+      if(colisionDetectada_m2){
+          println("HAY COLISION CON M2");
+      }
+      if(colisionDetectada_m2_pj)
+      {
+          // Perseguir mascota 2
+          println("HAY COLISION CON M1 Y PJ");
+          x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
+          y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
+      }
+      println("NO HAY COLISION");
+      
+      
       break;
     case BOSS:
       break;
@@ -204,30 +233,18 @@ void gameplayInitialize(){
   size_e = new float[num_e];
   
   
-  x_m1 = width/random(1,10);//random position
-  y_m1 = height/random(1,10);
+  x_m1 = width/2;//random position
+  y_m1 = 0;
   x_m2 = width/random(1,10);
   y_m2 = height/random(1,10);
   
-  alfa_m1 = random(0.001,0.01);
-  alfa_m2 = random(0.001,0.01);
+  alfa_m1 = random(0.001,0.1);
+  alfa_m2 = random(0.001,0.1);
   
   for(int i = 0; i < num_e; i++)
   {
     x_e[i] = width/random(1,10);
     y_e[i] = height/random(1,10);
-  }
-  
-  for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
-    if (i < num_e / 2) { 
-        alfa_enemy[i] = random(-0.01, -0.0001); 
-        
-    } else if (i < 3 * num_e / 4) { 
-        alfa_enemy[i] = random(0.01, 0.0001);
-        
-    } else { 
-        alfa_enemy[i] = random(0.01, 0.0001);
-    }
   }
   
   radio_enemy = 12;
