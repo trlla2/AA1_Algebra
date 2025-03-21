@@ -195,7 +195,6 @@ void draw(){
       {
         colisionDetectada_m2_pj = true;
       }
-      
       if (colisionDetectada) {
           println("HAY COLISION");
       }
@@ -212,12 +211,9 @@ void draw(){
           x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
           y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
       }
-      println("NO HAY COLISION");
-      
-      
-      break;
-    case BOSS:
-      break;
+      if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
+          println("NO HAY COLISION");
+      }
   }
   
 }
