@@ -61,7 +61,7 @@ int radio_enemy;
 float x_e[];
 float y_e[];
 
-int hp_e[] = new int[num_e];
+int hp_e[];
 
 // size
 float size_e[];
@@ -217,7 +217,7 @@ void draw(){
       }
       
       for (int i = 0; i < num_e; i++) {
-        if (hp_e[i] == 0){
+        if (hp_e[i] <= 0){
           // Colisiones PJ con Enemys
           if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
               colisionDetectada = true;
@@ -314,7 +314,7 @@ void gameplayInitialize(){
   x_e = new float [num_e];
   y_e = new float [num_e];
   size_e = new float[num_e];
-  
+  hp_e = new int[num_e];
   
   x_m1 = width/2;//random position
   y_m1 = 0;
