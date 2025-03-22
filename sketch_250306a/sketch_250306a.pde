@@ -61,6 +61,8 @@ int radio_enemy;
 float x_e[];
 float y_e[];
 
+int hp_e[] = new int[num_e];
+
 // size
 float size_e[];
 
@@ -118,6 +120,12 @@ void setup(){
   {
     x_e[i] = width/random(1,10);
     y_e[i] = height/random(1,10);
+  }
+  
+  // Set HP Enemy
+  for(int i = 0; i < num_e; i++)
+  {
+    hp_e[i] = 1;
   }
   
   
@@ -209,9 +217,11 @@ void draw(){
       }
       
       for (int i = 0; i < num_e; i++) {
-        // Colisiones PJ con Enemys
+        if (hp_e[i] == 0){
+          // Colisiones PJ con Enemys
           if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
               colisionDetectada = true;
+              hp_e[i] -= 1;
               break; // Sale del bucle si hay una colisión
           }
           else
@@ -236,6 +246,8 @@ void draw(){
           {
             colisionDetectada_m2 = false;
           }
+        }
+        
       }
       
       if (dist(x_m2, y_m2, x_pj, y_pj) < size_m2 + size_pj)
