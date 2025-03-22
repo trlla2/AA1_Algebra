@@ -93,8 +93,10 @@ int x_portal = height/4;
 int y_portal = width/2;
 
 // size
-int portal_height = 10;
-int portal_width = 30;
+int portal_height = 20;
+int portal_width = 60;
+
+
 
 //------------------------ Funciotns
 
@@ -274,7 +276,7 @@ void draw(){
           if(left_powerUps <= 0){ // draw portal
             rectMode(CENTER);  // draw portal from the center
             fill(0,0,255);  
-            rect( x_portal, y_portal, portal_height, portal_height); // Draw white rect using CORNER mode
+            rect( x_portal, y_portal, portal_width, portal_height); // Draw white rect using CORNER mode
           }
       }
       if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
@@ -398,17 +400,17 @@ void moved(){
     
     // portal position
     // Calcular límites del jugador
-    float PJ_left = x_pj - portal_height/2;
-    float PJ_right = x_pj + portal_height/2;
-    float PJ_top = y_pj - portal_width/2;
-    float PJ_bottom = y_pj + portal_width/2;
+    float PJ_left = x_pj - portal_width/2;
+    float PJ_right = x_pj + portal_width/2;
+    float PJ_top = y_pj - portal_height/2;
+    float PJ_bottom = y_pj + portal_height/2;
     
   
     // Calcular límites del muro
-    float wall_left = x_portal - portal_height/2;
-    float wall_right = x_portal + portal_height/2;
-    float wall_top = y_portal - portal_width/2;
-    float wall_bottom = y_portal + portal_width/2;
+    float wall_left = x_portal - portal_width/2;
+    float wall_right = x_portal + portal_width/2;
+    float wall_top = y_portal - portal_height/2;
+    float wall_bottom = y_portal + portal_height/2;
 
     // Detección AABB correcta
     if(PJ_right > wall_left && 
@@ -416,7 +418,6 @@ void moved(){
        PJ_bottom > wall_top && 
        PJ_top < wall_bottom) {
       println("enter portal");
-      break; // Salir del bucle al detectar primera colisión
     }
     
    }
