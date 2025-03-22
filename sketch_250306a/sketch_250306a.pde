@@ -68,6 +68,8 @@ float size_e[];
 int num_Good_PwUp = 3;
 int num_Bad_PwUp = 4;
 
+int left_powerUps = num_Good_PwUp; // left powerups to start bossfight 
+
 float[] good_PwUp_x = new float[num_Good_PwUp];// cord powerups 
 float[] good_PwUp_y = new float[num_Good_PwUp];
 
@@ -79,10 +81,20 @@ boolean[] active_Bad_PwUp = new boolean[num_Bad_PwUp];
 
 int radio_PwUps = 10; // tamaño radio PwUps
 
+// powerup modifiers
+float m_speed_powerUp = 0.03; // 1
+float m_size_powerUp = 3; // 2
+float pj_size_powerUp = 5; // 3
 
-float m_speed_powerUp = 0.03;
-float m_size_powerUp = 3;
-float pj_size_powerUp = 5;
+// teleport
+
+//Position
+int x_portal = height/4;
+int y_portal = width/2;
+
+// size
+int portal_height = 10;
+int portal_width = 30;
 
 //------------------------ Funciotns
 
@@ -245,6 +257,7 @@ void draw(){
           y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
           
           // Draw powerUps
+          fill(255,0,255); //color powerUps
           for(int i = 0; i < num_Good_PwUp; i++){
             if(active_Good_PwUp[i]){ // if they are active
              ellipse(good_PwUp_x[i],good_PwUp_y[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
@@ -257,6 +270,12 @@ void draw(){
             }
           }
           
+          
+          if(left_powerUps <= 0){ // draw portal
+            rectMode(CENTER);  // draw portal from the center
+            fill(0,0,255);  
+            rect( x_portal, y_portal, portal_height, portal_height); // Draw white rect using CORNER mode
+          }
       }
       if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
           //println("NO HAY COLISION");
@@ -328,6 +347,8 @@ void moved(){
                 break;
             }
             
+            left_powerUps --; // - powerUP to spawn the portal
+            
             active_Good_PwUp[i] = false;// deactivate powerUP
            break;
          }
@@ -352,10 +373,10 @@ void moved(){
                 alfa_m1 -= m_speed_powerUp; // reduce pet speed
                 alfa_m2 -= m_speed_powerUp;
                 
-                if(alfa_m1 <= 0){
+                if(alfa_m1 <= 0){ // speed cap
                   alfa_m1 = 0.001;
                 }
-                if(alfa_m2 <= 0){
+                if(alfa_m2 <= 0){ // speed cap
                   alfa_m2 = 0.001;
                 }
                 break;
@@ -374,7 +395,31 @@ void moved(){
       }
         
     }
-  }
+    
+    // portal position
+    // Calcular límites del jugador
+    float PJ_left = x_pj - portal_height/2;
+    float PJ_right = x_pj + portal_height/2;
+    float PJ_top = y_pj - portal_width/2;
+    float PJ_bottom = y_pj + portal_width/2;
+    
+  
+    // Calcular límites del muro
+    float wall_left = x_portal - portal_height/2;
+    float wall_right = x_portal + portal_height/2;
+    float wall_top = y_portal - portal_width/2;
+    float wall_bottom = y_portal + portal_width/2;
+
+    // Detección AABB correcta
+    if(PJ_right > wall_left && 
+       PJ_left < wall_right && 
+       PJ_bottom > wall_top && 
+       PJ_top < wall_bottom) {
+      println("enter portal");
+      break; // Salir del bucle al detectar primera colisión
+    }
+    
+   }
 }
 
 // -------- UI Functions
