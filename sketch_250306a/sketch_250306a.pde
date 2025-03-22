@@ -17,6 +17,10 @@ ControlP5 cp5;
 
 boolean startGame = false;
 
+// time stuff
+
+ControlTimer pet_fear_timer;
+
 //Control
 
 int controler = 1; // 1 - para raton 0 - for teclado
@@ -51,7 +55,7 @@ boolean colisionDetectada = false;
 boolean colisionDetectada_m1 = false;
 boolean colisionDetectada_m2 = false;
 boolean colisionDetectada_m2_pj = false;
-boolean distancia_e_m2 = false;
+boolean distancia_e_m2[];
 
 
 // PNJs (Enemigos)
@@ -245,22 +249,22 @@ void draw(){
         colisionDetectada_m2_pj = true;
       }
       if (colisionDetectada) {
-          println("HAY COLISION");
+          //println("HAY COLISION");
       }
       if(colisionDetectada_m1){
-          println("HAY COLISION CON M1");
+          //println("HAY COLISION CON M1");
       }
       if(colisionDetectada_m2){
-          println("HAY COLISION CON M2");
+          //println("HAY COLISION CON M2");
       }
-      if(distancia_e_m2)
-      {
-          println("HAY DETECCIÓN CON M2");
-      }
+      //if(distancia_e_m2)
+      //{
+        //println("HAY DETECCIÓN CON M2");
+      //}
       if(colisionDetectada_m2_pj)
       {
           // Perseguir mascota 2
-          println("HAY COLISION CON M1 Y PJ");
+         // println("HAY COLISION CON M1 Y PJ");
           x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
           y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
           
@@ -285,19 +289,27 @@ void draw(){
             rect( x_portal, y_portal, portal_width, portal_height); // Draw white rect using CORNER mode
           }
       }
-      for (int i = 0; i < num_e; i++)
+      for (int i = 0; i < num_e; i++) // fear of the pet
       {
         if (hp_e[i] > 0){
-          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2 + 50 && colisionDetectada_m2_pj)
+          
+          float[] vector_distance = new float[2]; // check distance
+           vector_distance[0] = x_e[i] -x_m2;
+           vector_distance[1] = y_e[i] - y_m2;
+            
+          if (sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]) < 50 || distancia_e_m2[i]) // calculate distance
             {
-              distancia_e_m2 = true;
-              x_m2 = (1 - alfa_m2) * x_m2 - alfa_m2 * x_pj;
-              y_m2 = (1 - alfa_m2) * y_m2 - alfa_m2 * y_pj;
+              distancia_e_m2[i] = true;
+              
+              
+              
+              x_m2 = (1 - 0.01) * x_m2 - 0.01 * x_e[i];
+              y_m2 = (1 - 0.01) * y_m2 - 0.01 * y_e[i];
+
+              if(sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1])  >  100){
+                distancia_e_m2[i] = false;
+              }
               break;
-            }
-            else
-            {
-              distancia_e_m2 = false;
             }
           }
       }
@@ -325,6 +337,8 @@ void gameplayInitialize(){
   y_e = new float [num_e];
   size_e = new float[num_e];
   hp_e = new int[num_e];
+  distancia_e_m2 = new boolean[num_e];
+  
   
   x_m1 = width/2;//random position
   y_m1 = 0;
@@ -353,6 +367,11 @@ void gameplayInitialize(){
     x_e[i] = width/random(1,10);
     y_e[i] = height/random(1,10);
   }
+
+  // initialize timers
+  
+  pet_fear_timer = new ControlTimer();
+  pet_fear_timer.setSpeedOfTime(1); // speed of the timer
 }
 
 void moved(){
@@ -450,7 +469,7 @@ void moved(){
     if(PJ_right > wall_left && 
        PJ_left < wall_right && 
        PJ_bottom > wall_top && 
-       PJ_top < wall_bottom) {
+       PJ_top < wall_bottom && left_powerUps <= 0) {
       println("enter portal");
     }
     
