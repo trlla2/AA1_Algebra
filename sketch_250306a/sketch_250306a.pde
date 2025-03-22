@@ -65,19 +65,19 @@ float y_e[];
 float size_e[];
 
 // PowerUps
-int num_Good_PwUp = 3;
-int num_Bad_PwUp = 4;
+int num_PwUp = 3;
+int num_PwDwn = 4;
 
-int left_powerUps = num_Good_PwUp; // left powerups to start bossfight 
+int left_powerUps = num_PwUp; // left powerups to start bossfight 
 
-float[] good_PwUp_x = new float[num_Good_PwUp];// cord powerups 
-float[] good_PwUp_y = new float[num_Good_PwUp];
+float[] x_PwUp = new float[num_PwUp];// cord powerups 
+float[] y_PwUp = new float[num_PwUp];
 
-float[] bad_PwUp_x = new float[num_Bad_PwUp];
-float[] bad_PwUp_y = new float[num_Bad_PwUp];
+float[] x_PwDwn = new float[num_PwDwn];
+float[] y_PwDwn = new float[num_PwDwn];
 
-boolean[] active_Good_PwUp = new boolean[num_Good_PwUp]; // if powerUPs are active
-boolean[] active_Bad_PwUp = new boolean[num_Bad_PwUp];
+boolean[] active_PwUp = new boolean[num_PwUp]; // if powerUPs are active
+boolean[] active_PwDwn = new boolean[num_PwDwn];
 
 int radio_PwUps = 10; // tamaño radio PwUps
 
@@ -125,16 +125,16 @@ void setup(){
   radio_enemy = 12;
   
   // SetUp powerUps
-  for(int i = 0; i < num_Good_PwUp; i++){
-      good_PwUp_x[i] = width/random(1, 10);// set random position
-      good_PwUp_y[i] = height/random(1, 10);
-      active_Good_PwUp[i] = true;
+  for(int i = 0; i < num_PwUp; i++){
+      x_PwUp[i] = width/random(1, 10);// set random position
+      y_PwUp[i] = height/random(1, 10);
+      active_PwUp[i] = true;
   }
   
-  for(int i = 0; i < num_Bad_PwUp; i++){
-      bad_PwUp_x[i] = width / random( 1, 10);// set random position
-      bad_PwUp_y[i] = height/random(1, 10);
-      active_Bad_PwUp[i] = true;
+  for(int i = 0; i < num_PwDwn; i++){
+      x_PwDwn[i] = width / random( 1, 10);// set random position
+      y_PwDwn[i] = height/random(1, 10);
+      active_PwDwn[i] = true;
   }
   
 }
@@ -260,15 +260,15 @@ void draw(){
           
           // Draw powerUps
           fill(255,0,255); //color powerUps
-          for(int i = 0; i < num_Good_PwUp; i++){
-            if(active_Good_PwUp[i]){ // if they are active
-             ellipse(good_PwUp_x[i],good_PwUp_y[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
+          for(int i = 0; i < num_PwUp; i++){
+            if(active_PwUp[i]){ // if they are active
+             ellipse(x_PwUp[i],y_PwUp[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
             }
           }
           
-          for(int i = 0; i < num_Bad_PwUp; i++){
-            if(active_Bad_PwUp[i]){ // if they are active
-             ellipse(bad_PwUp_x[i],bad_PwUp_y[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
+          for(int i = 0; i < num_PwDwn; i++){
+            if(active_PwDwn[i]){ // if they are active
+             ellipse(x_PwDwn[i],y_PwDwn[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
             }
           }
           
@@ -323,13 +323,13 @@ void gameplayInitialize(){
 
 void moved(){
   if(colisionDetectada_m2_pj){// if player got de second pet 
-    for(int i = 0; i < num_Good_PwUp; i++){// good powerups collision
-      if(active_Good_PwUp[i]) {
+    for(int i = 0; i < num_PwUp; i++){// good powerups collision
+      if(active_PwUp[i]) {
         //Collison
          // Collision = Distance <= radipj + radipnj
          float[] vector_distance = new float[2];
-         vector_distance[0] = good_PwUp_x[i] - x_pj;
-         vector_distance[1] = good_PwUp_y[i] - y_pj;
+         vector_distance[0] = x_PwUp[i] - x_pj;
+         vector_distance[1] = y_PwUp[i] - y_pj;
          float module_distance = sqrt(vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]);
            
          if(module_distance <= radio_PwUps * 2){ // if they colision
@@ -351,20 +351,20 @@ void moved(){
             
             left_powerUps --; // - powerUP to spawn the portal
             
-            active_Good_PwUp[i] = false;// deactivate powerUP
+            active_PwUp[i] = false;// deactivate powerUP
            break;
          }
       }
         
     }
     
-    for(int i = 0; i < num_Bad_PwUp; i++){ // bad powerup collision
-      if(active_Bad_PwUp[i]) {
+    for(int i = 0; i < num_PwDwn; i++){ // bad powerup collision
+      if(active_PwDwn[i]) {
         //Collison
          // Collision = Distance <= radipj + radipnj
          float[] vector_distance = new float[2];
-         vector_distance[0] = bad_PwUp_x[i] - x_pj;
-         vector_distance[1] = bad_PwUp_y[i] - y_pj;
+         vector_distance[0] = x_PwDwn[i] - x_pj;
+         vector_distance[1] = y_PwDwn[i] - y_pj;
          float module_distance = sqrt(vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]);
            
          if(module_distance <= radio_PwUps * 2){ // if they colision
@@ -391,7 +391,7 @@ void moved(){
                 break;
             }
             
-            active_Bad_PwUp[i] = false;// deactivate powerUP
+            active_PwDwn[i] = false;// deactivate powerUP
            break;
          }
       }
