@@ -463,10 +463,10 @@ void moved(){
     
     // portal position
     // Calcular límites del jugador
-    float PJ_left = x_pj - portal_width/2;
-    float PJ_right = x_pj + portal_width/2;
-    float PJ_top = y_pj - portal_height/2;
-    float PJ_bottom = y_pj + portal_height/2;
+    float PJ_left = x_pj - size_pj/2;
+    float PJ_right = x_pj + size_pj/2;
+    float PJ_top = y_pj - size_pj/2;
+    float PJ_bottom = y_pj + size_pj/2;
     
   
     // Calcular límites del muro
