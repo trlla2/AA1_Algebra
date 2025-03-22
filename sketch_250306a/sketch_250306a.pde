@@ -21,6 +21,8 @@ boolean startGame = false;
 
 ControlTimer pet_fear_timer;
 
+int startTime = 0;
+
 //Control
 
 int controler = 1; // 1 - para raton 0 - for teclado
@@ -57,7 +59,9 @@ boolean colisionDetectada_m1 = false;
 boolean colisionDetectada_m2 = false;
 boolean colisionDetectada_m2_pj = false;
 boolean distancia_e_m2[];
-boolean lose_hp_m2;
+
+int attackTimer = 2000;
+
 
 
 // PNJs (Enemigos)
@@ -235,19 +239,20 @@ void draw(){
             colisionDetectada_m1 = false;
           }
           // Colisiones m2 con Enemys
-          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2) {
+          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2 && millis() > startTime + attackTimer) {
               colisionDetectada_m2 = true;
-              if(!lose_hp_m2)
-              {
-                hp_m2 -= 1;
-                lose_hp_m2 = true;
-              }
+              
+              
+              startTime = millis();
+              
+              hp_m2 -= 1;
+
               break; // Sale del bucle si hay una colisión
           }
           else
           {
             colisionDetectada_m2 = false;
-            lose_hp_m2 = false;
+            
           }
         }
       }
@@ -310,8 +315,6 @@ void draw(){
           if (sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]) < 50 || distancia_e_m2[i]) // calculate distance
             {
               distancia_e_m2[i] = true;
-              
-              
               
               x_m2 = (1 - 0.01) * x_m2 - 0.01 * x_e[i];
               y_m2 = (1 - 0.01) * y_m2 - 0.01 * y_e[i];
