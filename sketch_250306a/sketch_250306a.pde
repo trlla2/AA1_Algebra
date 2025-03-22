@@ -50,12 +50,14 @@ float alfa_m2;
 float alfa_eN;
 float alfa_eP;
 
+int hp_m2 = 3;
 
 boolean colisionDetectada = false;
 boolean colisionDetectada_m1 = false;
 boolean colisionDetectada_m2 = false;
 boolean colisionDetectada_m2_pj = false;
 boolean distancia_e_m2[];
+boolean lose_hp_m2;
 
 
 // PNJs (Enemigos)
@@ -235,14 +237,22 @@ void draw(){
           // Colisiones m2 con Enemys
           if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2) {
               colisionDetectada_m2 = true;
+              if(!lose_hp_m2)
+              {
+                hp_m2 -= 1;
+                lose_hp_m2 = true;
+              }
               break; // Sale del bucle si hay una colisión
           }
           else
           {
             colisionDetectada_m2 = false;
+            lose_hp_m2 = false;
           }
         }
       }
+      
+      println(hp_m2);
       
       if (dist(x_m2, y_m2, x_pj, y_pj) < size_m2 + size_pj)
       {
