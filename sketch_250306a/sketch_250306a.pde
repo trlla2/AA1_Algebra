@@ -64,6 +64,26 @@ float y_e[];
 // size
 float size_e[];
 
+// PowerUps
+int num_Good_PwUp = 3;
+int num_Bad_PwUp = 4;
+
+float[] good_PwUp_x = new float[num_Good_PwUp];// cord powerups 
+float[] good_PwUp_y = new float[num_Good_PwUp];
+
+float[] bad_PwUp_x = new float[num_Bad_PwUp];
+float[] bad_PwUp_y = new float[num_Bad_PwUp];
+
+boolean[] active_Good_PwUp = new boolean[num_Good_PwUp]; // if powerUPs are active
+boolean[] active_Bad_PwUp = new boolean[num_Bad_PwUp];
+
+int radio_PwUps = 10; // tamaño radio PwUps
+
+
+float m_speed_powerUp = 0.03;
+float m_size_powerUp = 3;
+float pj_size_powerUp = 5;
+
 //------------------------ Funciotns
 
 void setup(){
@@ -89,6 +109,19 @@ void setup(){
   
   
   radio_enemy = 12;
+  
+  // SetUp powerUps
+  for(int i = 0; i < num_Good_PwUp; i++){
+      good_PwUp_x[i] = width/random(1, 10);// set random position
+      good_PwUp_y[i] = height/random(1, 10);
+      active_Good_PwUp[i] = true;
+  }
+  
+  for(int i = 0; i < num_Bad_PwUp; i++){
+      bad_PwUp_x[i] = width / random( 1, 10);// set random position
+      bad_PwUp_y[i] = height/random(1, 10);
+      active_Bad_PwUp[i] = true;
+  }
   
 }
 
@@ -196,29 +229,50 @@ void draw(){
         colisionDetectada_m2_pj = true;
       }
       if (colisionDetectada) {
-          println("HAY COLISION");
+          //println("HAY COLISION");
       }
       if(colisionDetectada_m1){
-          println("HAY COLISION CON M1");
+          //println("HAY COLISION CON M1");
       }
       if(colisionDetectada_m2){
-          println("HAY COLISION CON M2");
+          //println("HAY COLISION CON M2");
       }
       if(colisionDetectada_m2_pj)
       {
           // Perseguir mascota 2
-          println("HAY COLISION CON M1 Y PJ");
+          //println("HAY COLISION CON M1 Y PJ");
           x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
           y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
+          
+          // Draw powerUps
+          for(int i = 0; i < num_Good_PwUp; i++){
+            if(active_Good_PwUp[i]){ // if they are active
+             ellipse(good_PwUp_x[i],good_PwUp_y[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
+            }
+          }
+          
+          for(int i = 0; i < num_Bad_PwUp; i++){
+            if(active_Bad_PwUp[i]){ // if they are active
+             ellipse(bad_PwUp_x[i],bad_PwUp_y[i],radio_PwUps * 2, radio_PwUps * 2); //Draw Good PWUp
+            }
+          }
+          
       }
       if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
-          println("NO HAY COLISION");
+          //println("NO HAY COLISION");
       }
+      break;
   }
   
 }
 
-// GAMEPLAY Functions
+void mouseMoved(){ // on mouse moved
+  if(actualScene == Scenes.GAMEPLAY){ // if we are in GAMEPLAY SCENE
+    moved();
+  }
+}
+
+// -------- GAMEPLAY Functions
 
 void gameplayInitialize(){
   // initialize arrays
@@ -244,6 +298,83 @@ void gameplayInitialize(){
   }
   
   radio_enemy = 12;
+}
+
+void moved(){
+  if(colisionDetectada_m2_pj){// if player got de second pet 
+    for(int i = 0; i < num_Good_PwUp; i++){// good powerups collision
+      if(active_Good_PwUp[i]) {
+        //Collison
+         // Collision = Distance <= radipj + radipnj
+         float[] vector_distance = new float[2];
+         vector_distance[0] = good_PwUp_x[i] - x_pj;
+         vector_distance[1] = good_PwUp_y[i] - y_pj;
+         float module_distance = sqrt(vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]);
+           
+         if(module_distance <= radio_PwUps * 2){ // if they colision
+            println("collision true");
+            
+            switch(i){
+              case 1:
+                alfa_m1 += m_speed_powerUp; // augment pet speed
+                alfa_m2 += m_speed_powerUp;
+                break;
+              case 2:
+                size_m1 -= m_size_powerUp; // reduce pet size
+                size_m2 -= m_size_powerUp;
+                break;
+              case 3:
+                size_pj += pj_size_powerUp; // augment player size
+                break;
+            }
+            
+            active_Good_PwUp[i] = false;// deactivate powerUP
+           break;
+         }
+      }
+        
+    }
+    
+    for(int i = 0; i < num_Bad_PwUp; i++){ // bad powerup collision
+      if(active_Bad_PwUp[i]) {
+        //Collison
+         // Collision = Distance <= radipj + radipnj
+         float[] vector_distance = new float[2];
+         vector_distance[0] = bad_PwUp_x[i] - x_pj;
+         vector_distance[1] = bad_PwUp_y[i] - y_pj;
+         float module_distance = sqrt(vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]);
+           
+         if(module_distance <= radio_PwUps * 2){ // if they colision
+            println("collision true");
+            
+            switch(i){
+              case 1:
+                alfa_m1 -= m_speed_powerUp; // reduce pet speed
+                alfa_m2 -= m_speed_powerUp;
+                
+                if(alfa_m1 <= 0){
+                  alfa_m1 = 0.001;
+                }
+                if(alfa_m2 <= 0){
+                  alfa_m2 = 0.001;
+                }
+                break;
+              case 2:
+                size_m1 += m_size_powerUp; // augment pet size
+                size_m2 += m_size_powerUp;
+                break;
+              case 3:
+                size_pj -= pj_size_powerUp; // reduce player size
+                break;
+            }
+            
+            active_Bad_PwUp[i] = false;// deactivate powerUP
+           break;
+         }
+      }
+        
+    }
+  }
 }
 
 // -------- UI Functions
