@@ -51,6 +51,7 @@ boolean colisionDetectada = false;
 boolean colisionDetectada_m1 = false;
 boolean colisionDetectada_m2 = false;
 boolean colisionDetectada_m2_pj = false;
+boolean distancia_e_m2 = false;
 
 
 // PNJs (Enemigos)
@@ -115,20 +116,6 @@ void setup(){
   
   alfa_m1 = random(0.001,0.01);
   alfa_m2 = random(0.001,0.01);
-  
-  for(int i = 0; i < num_e; i++)
-  {
-    x_e[i] = width/random(1,10);
-    y_e[i] = height/random(1,10);
-  }
-  
-  // Set HP Enemy
-  for(int i = 0; i < num_e; i++)
-  {
-    hp_e[i] = 1;
-  }
-  
-  
   
   radio_enemy = 12;
   
@@ -210,14 +197,18 @@ void draw(){
       ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
       fill(90,255,200);
       ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
-    
+      
       for (int i = 0; i < num_e; i++) {
-          fill(255,0,0);
-          ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
+          if (hp_e[i] > 0)
+          {
+            fill(255,0,0);
+            ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
+          }
+          
       }
       
       for (int i = 0; i < num_e; i++) {
-        if (hp_e[i] <= 0){
+        if (hp_e[i] > 0){
           // Colisiones PJ con Enemys
           if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
               colisionDetectada = true;
@@ -247,7 +238,6 @@ void draw(){
             colisionDetectada_m2 = false;
           }
         }
-        
       }
       
       if (dist(x_m2, y_m2, x_pj, y_pj) < size_m2 + size_pj)
@@ -255,18 +245,22 @@ void draw(){
         colisionDetectada_m2_pj = true;
       }
       if (colisionDetectada) {
-          //println("HAY COLISION");
+          println("HAY COLISION");
       }
       if(colisionDetectada_m1){
-          //println("HAY COLISION CON M1");
+          println("HAY COLISION CON M1");
       }
       if(colisionDetectada_m2){
-          //println("HAY COLISION CON M2");
+          println("HAY COLISION CON M2");
+      }
+      if(distancia_e_m2)
+      {
+          println("HAY DETECCIÓN CON M2");
       }
       if(colisionDetectada_m2_pj)
       {
           // Perseguir mascota 2
-          //println("HAY COLISION CON M1 Y PJ");
+          println("HAY COLISION CON M1 Y PJ");
           x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
           y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
           
@@ -289,6 +283,22 @@ void draw(){
             rectMode(CENTER);  // draw portal from the center
             fill(0,0,255);  
             rect( x_portal, y_portal, portal_width, portal_height); // Draw white rect using CORNER mode
+          }
+      }
+      for (int i = 0; i < num_e; i++)
+      {
+        if (hp_e[i] > 0){
+          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2 + 50 && colisionDetectada_m2_pj)
+            {
+              distancia_e_m2 = true;
+              x_m2 = (1 - alfa_m2) * x_m2 - alfa_m2 * x_pj;
+              y_m2 = (1 - alfa_m2) * y_m2 - alfa_m2 * y_pj;
+              break;
+            }
+            else
+            {
+              distancia_e_m2 = false;
+            }
           }
       }
       if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
@@ -331,6 +341,18 @@ void gameplayInitialize(){
   }
   
   radio_enemy = 12;
+  
+  // Set HP Enemy
+  for(int i = 0; i < num_e; i++)
+  {
+    hp_e[i] = 1;
+  }
+  
+  for(int i = 0; i < num_e; i++)
+  {
+    x_e[i] = width/random(1,10);
+    y_e[i] = height/random(1,10);
+  }
 }
 
 void moved(){
