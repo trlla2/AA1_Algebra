@@ -9,7 +9,7 @@ int _heightSetup = 600;
 
 // Scenes
 
-enum Scenes{MENU, GAMEPLAY, BOSS};
+enum Scenes{MENU, GAMEPLAY, BOSS, GAMEOVER, WIN};
 Scenes actualScene = Scenes.MENU;
 
 // UI
@@ -37,6 +37,11 @@ int GameplayTime = 0;
 int GameplayHurtTime = 60000;
 int GameplayTimer = 0;
 
+int warningStartTime = 0;
+int warningTimer = 2000;
+
+int endSceneTime = 0;
+int endSceneTimer = 3000;
 
 //Control
 
@@ -360,11 +365,7 @@ void draw(){
           if(hp_m2 <= 0)
           {
             hp_pj -= 1;
-            //println(hp_pj);
-            if(hp_pj <= 0){
-              actualScene = Scenes.MENU; // go to menu
-              menuInitialize();
-            }
+            
           }
           if (hp_m2 <= 0)
           {
@@ -379,19 +380,7 @@ void draw(){
       {
         colisionDetectada_m2_pj = true;
       }
-      if (colisionDetectada) {
-          //println("HAY COLISION");
-      }
-      if(colisionDetectada_m1){
-          //println("HAY COLISION CON M1");
-      }
-      if(colisionDetectada_m2){
-          //println("HAY COLISION CON M2");
-      }
-      //if(distancia_e_m2)
-      //{
-        //println("HAY DETECCIÓN CON M2");
-      //}
+      
       if(colisionDetectada_m2_pj)
       {
           // Perseguir mascota 2
@@ -457,9 +446,26 @@ void draw(){
         }
       }
       
-      if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
-          //println("NO HAY COLISION");
+      
+      
+      if(hp_pj <= 0){ // should be alive
+        actualScene = Scenes.GAMEOVER; // go to GAME over screen 
+        endSceneTime = millis();
       }
+      
+      // UI
+      PFont font;
+      font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
+      fill(255,0,0);
+      textFont(font);
+      text( hp_pj, width - width/10, height/10);
+      
+      fill(255,255,0);
+      textFont(font);
+      text( score,  width/10, height/10);
+      
+      
+      
       
       break;
       case BOSS:
@@ -526,8 +532,8 @@ void draw(){
         ellipse(x_boss,y_boss,size_boss*2,size_boss*2);
       }
       else{
-        actualScene = Scenes.MENU;
-         menuInitialize();
+        actualScene = Scenes.WIN;
+         endSceneTime = millis();
       }
 
       alfa_boss = random(0.01, 0.001); 
@@ -585,14 +591,48 @@ void draw(){
         hp_m2 = 3;
       }
       
-      if(colisionDetectada_m2){
-        println("HAY COLISION CON M2");
-      }
-      if(colision_pj_boss)
-      {
-        println("HAY COLISION CON BOSS");
+      
+      
+      if(hp_pj <= 0){ // should be alive
+        actualScene = Scenes.GAMEOVER; // go to GAME over screen 
+        endSceneTime = millis();
+        
       }
       
+      // UI
+      
+      font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
+      fill(255,0,0);
+      textFont(font);
+      text( hp_pj, width - width/10, height/10);
+      
+      fill(255,255,0);
+      textFont(font);
+      text( score,  width/10, height/10);
+      
+      break;
+    case GAMEOVER:
+      font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
+      fill(255,0,0);
+      textFont(font);
+      text( "Game Over :(",width/2, height/2);
+      
+      if(millis() > endSceneTime + endSceneTimer){
+        actualScene = Scenes.MENU; // go to MENU
+        menuInitialize();
+      }
+      break;
+     case WIN:
+      font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
+      fill(0,255,0);
+      textFont(font);
+      text( "YOU WIN :)",width/2, height/2);
+      
+      if(millis() > endSceneTime + endSceneTimer){
+        actualScene = Scenes.MENU; // go to MENU
+        menuInitialize();
+      }
+      break;
   }
   
 }
@@ -657,7 +697,8 @@ void gameplayInitialize(){
   // reset timer
   GameplayTime = millis();
   GameplayTimer = 0;
-  
+  endSceneTime = 0;
+  score = 0; // reset score
   // initialize arrays
   
   alfa_enemy = new float [num_e];
@@ -755,18 +796,25 @@ void gameplayInitialize(){
 }
 
 void timer(){
-  GameplayTimer = int((millis() - GameplayTime) / 1000);
-  
+  GameplayTimer = (millis() - GameplayTime);
+
   if(GameplayTimer >= GameplayHurtTime){
     GameplayTime = millis();
     hp_pj --;
+    warningStartTime = millis();
   }
   
   PFont font;
   font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
   fill(255);
   textFont(font);
-  text(GameplayTimer, width/2, height/10);
+  text(int(GameplayTimer/1000), height/2, width/10);
+  
+  if(millis() < warningStartTime + warningTimer && hp_pj < 3){
+    fill(255,0,0);
+    textFont(font);
+    text("Penalizacion por lento ( - 1 vida)",  height/2,width/2);
+  }
 }
 
 void moved(){
@@ -895,7 +943,6 @@ boolean checkWallColisoin(float x , float y, float size){
          PJ_left < wall_right && 
          PJ_bottom > wall_top && 
          PJ_top < wall_bottom) {
-         println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
          return true;
       }
    }
