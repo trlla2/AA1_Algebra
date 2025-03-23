@@ -229,9 +229,11 @@ void draw(){
       
       
       // Perseguir mascota 1
-      x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
-      y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
-      
+      if (!checkWallColisoin((1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1), (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj, size_m1))
+      {
+         x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
+         y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
+      }
       // Spawn Enemyes
       if (millis() > lastSpawnTime + lastSpawnTimer && num_spawn_e < num_e){
         println("Spawnean");
@@ -394,9 +396,20 @@ void draw(){
       {
           // Perseguir mascota 2
          // println("HAY COLISION CON M1 Y PJ");
-          x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
-          y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
-          
+         if (!checkWallColisoin((1 - alfa_m2) * x_m2 + alfa_m2 * x_pj, (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2), size_m2))
+         {
+            x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
+            y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);
+         }
+         else
+         {
+            if (millis() > startTimeM2 + attackTimerM2) {
+              colisionDetectada_m2 = true;
+              startTimeM2 = millis();
+              hp_m2 -= 1;
+          }
+         }
+         
           // Draw powerUps
           fill(255,0,255); //color powerUps
           for(int i = 0; i < num_PwUp; i++){
@@ -517,7 +530,7 @@ void draw(){
          menuInitialize();
       }
 
-      alfa_boss = random(0.01, 0.0001); 
+      alfa_boss = random(0.01, 0.001); 
       
       x_boss = (1 - alfa_boss) * x_boss + alfa_boss * x_m2;
       y_boss = (1 - alfa_boss) * y_boss + alfa_boss * y_m2;
@@ -544,9 +557,9 @@ void draw(){
          colisionDetectada_m2 = false;
       }
       
-      if (dist(x_boss, y_boss, x_m1, y_m1) < size_boss + size_m1 && millis() > startTimeM1 + attackTimerM1) {
+      if (dist(x_boss, y_boss, x_m1, y_m1) < size_boss + size_m1 && millis() > startTimeBoss + attackTimerBoss) {
               colisionDetectada_m1 = true;
-              startTimeM1 = millis();
+              startTimeBoss = millis();
               hp_boss -= 1;
               score++;
               println(hp_boss);
