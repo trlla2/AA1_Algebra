@@ -44,6 +44,8 @@ float color_pj_b = 255;
 //size
 float size_pj = 15;
 
+int hp_pj = 3;
+
 // PNJs (mascotas)
 
 //position
@@ -117,6 +119,12 @@ int y_portal = width/2;
 int portal_height = 20;
 int portal_width = 60;
 
+// BOSS
+float size_boss = 30;
+float alfa_boss;
+float x_boss, y_boss;
+int hp_boss = 5;
+
 
 
 //------------------------ Funciotns
@@ -125,12 +133,6 @@ void setup(){
   size(_widthSetup,_heightSetup); //ventana
   
   gui(); // UI
-
-  
-  x_m1 = width/random(1,10);//random position
-  y_m1 = height/random(1,10);
-  x_m2 = width/random(1,10);
-  y_m2 = height/random(1,10);
   
   alfa_m1 = random(0.001,0.01);
   alfa_m2 = random(0.001,0.01);
@@ -168,7 +170,7 @@ void draw(){
       }
       break;
     case GAMEPLAY:
-        // ----- pj
+      // ----- pj
       // set position pj
       if(controler == 1){ // control reton
         x_pj = mouseX;
@@ -283,6 +285,15 @@ void draw(){
             colisionDetectada_m2 = false;
             
           }
+          if(hp_m2 <= 0)
+          {
+            hp_pj -= 1;
+            println(hp_pj);
+          }
+          if (hp_m2 <= 0)
+          {
+            hp_m2 = 3;
+          }
         }
       }
       
@@ -333,32 +344,117 @@ void draw(){
             rect( x_portal, y_portal, portal_width, portal_height); // Draw white rect using CORNER mode
           }
       }
-      for (int i = 0; i < num_e; i++) // fear of the pet
+      if (colisionDetectada_m2_pj)
       {
-        if (hp_e[i] > 0){
-          
-          float[] vector_distance = new float[2]; // check distance
-           vector_distance[0] = x_e[i] -x_m2;
-           vector_distance[1] = y_e[i] - y_m2;
+        for (int i = 0; i < num_e; i++) // fear of the pet
+        {
+          if (hp_e[i] > 0){
             
-          if (sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]) < 50 || distancia_e_m2[i]) // calculate distance
-            {
-              distancia_e_m2[i] = true;
+            float[] vector_distance = new float[2]; // check distance
+             vector_distance[0] = x_e[i] -x_m2;
+             vector_distance[1] = y_e[i] - y_m2;
               
-              x_m2 = (1 - 0.01) * x_m2 - 0.01 * x_e[i];
-              y_m2 = (1 - 0.01) * y_m2 - 0.01 * y_e[i];
-
-              if(sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1])  >  100){
-                distancia_e_m2[i] = false;
+            if (sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1]) < 50 || distancia_e_m2[i]) // calculate distance
+              {
+                distancia_e_m2[i] = true;
+                
+                x_m2 = (1 - 0.01) * x_m2 - 0.01 * x_e[i];
+                y_m2 = (1 - 0.01) * y_m2 - 0.01 * y_e[i];
+  
+                if(sqrt( vector_distance[0] * vector_distance[0] + vector_distance[1] * vector_distance[1])  >  100){
+                  distancia_e_m2[i] = false;
+                }
+                break;
               }
-              break;
             }
-          }
+        }
       }
+      
       if (!colisionDetectada && !colisionDetectada_m1 && !colisionDetectada_m2 && !colisionDetectada_m2_pj) {
           //println("NO HAY COLISION");
       }
+      
       break;
+      case BOSS:
+      
+      // ----- pj
+      // set position pj
+      if(controler == 1){ // control reton
+        x_pj = mouseX;
+        y_pj = mouseY;  
+      }
+      else if(controler == 0){
+        if (left){
+          x_pj -= speed;
+          moved(); //call function on moved
+        }
+        if (right){
+          x_pj += speed;
+          moved(); //call function on moved
+        }
+        if (up){
+          y_pj -= speed;
+          moved(); //call function on moved
+        }
+        if (down){
+          y_pj += speed;
+          moved(); //call function on moved
+        } 
+      }
+      // draw
+      fill(0,255,0);
+      ellipse(x_pj,y_pj,size_pj*2,size_pj*2);
+      
+      // Perseguir mascota 1
+      x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
+      y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
+      
+      // Pintar PNJ's
+      fill(255,255,0);
+      ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
+      fill(90,255,200);
+      ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
+      
+      if (colisionDetectada_m2_pj)
+      {
+         x_m2 = (1 - alfa_m2) * x_m2 + alfa_m2 * x_pj;
+         y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);  
+      }
+      
+      fill(255, 0, 0);
+      ellipse(x_boss,y_boss,size_boss*2,size_boss*2);
+      
+      alfa_boss = random(0.01, 0.0001); 
+      
+      x_boss = (1 - alfa_boss) * x_boss + alfa_boss * x_m2;
+      y_boss = (1 - alfa_boss) * y_boss + alfa_boss * y_m2;
+      
+      if (dist(x_boss, y_boss, x_m2, y_m2) < size_boss + size_m2 && millis() > startTime + attackTimer) {
+              colisionDetectada_m2 = true;
+              startTime = millis();
+              hp_m2 -= 1;
+              println(hp_m2);
+      }
+      else
+      {
+         colisionDetectada_m2 = false;
+      }
+      
+      if(hp_m2 <= 0)
+      {
+        hp_pj -= 1;
+        println(hp_pj);
+      }
+      
+      if (hp_m2 <= 0)
+      {
+        hp_m2 = 3;
+      }
+      
+      if(colisionDetectada_m2){
+        println("HAY COLISION CON M2");
+      }
+      
   }
   
 }
@@ -426,10 +522,41 @@ void gameplayInitialize(){
   alfa_m1 = random(0.001,0.1);
   alfa_m2 = random(0.001,0.1);
   
+  int aux;
+  
   for(int i = 0; i < num_e; i++)
   {
-    x_e[i] = width/random(1,10);
-    y_e[i] = height/random(1,10);
+    if (alfa_enemy[i] > 0)
+    {
+      aux = int(random(1, 4));
+      if(aux == 1)
+      {
+        x_e[i] = width/random(1,10);
+        y_e[i] = -10;
+      }
+      else if(aux == 2)
+      {
+        x_e[i] = width/random(1,10);
+        y_e[i] = height + 10;
+      }
+      else if(aux == 3)
+      {
+        x_e[i] = -10;
+        y_e[i] = height/random(1,10);
+      }
+      else
+      {
+        x_e[i] = width + 10;
+        y_e[i] = height/random(1,10);
+      }
+    }
+    else
+    {
+       x_e[i] = width/random(1,10);
+       y_e[i] = height/random(1,10);
+    }
+    
+    
   }
   
   radio_enemy = 12;
@@ -440,19 +567,17 @@ void gameplayInitialize(){
     hp_e[i] = 1;
   }
   
-  for(int i = 0; i < num_e; i++)
-  {
-    x_e[i] = width/random(1,10);
-    y_e[i] = height/random(1,10);
-  }
-
   // initialize timers
   
   pet_fear_timer = new ControlTimer();
   pet_fear_timer.setSpeedOfTime(1); // speed of the timer
 }
 
-
+void bossInitialize()
+{
+  x_boss = width/2;//random position
+  y_boss = width/2;
+}
 
 void moved(){
   if(colisionDetectada_m2_pj){// if player got de second pet 
@@ -551,8 +676,9 @@ void moved(){
        PJ_bottom > wall_top && 
        PJ_top < wall_bottom && left_powerUps <= 0) {
       println("enter portal");
+      actualScene = Scenes.BOSS; //set GAMEPLAY scene
+      bossInitialize();
     }
-    
    }
 }
 
