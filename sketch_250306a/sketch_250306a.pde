@@ -33,6 +33,7 @@ boolean up = false;
 boolean down = false;
 boolean left = false;
 boolean right = false;
+boolean first_position = true;
 
 
 // PJ
@@ -124,6 +125,7 @@ float size_boss = 30;
 float alfa_boss;
 float x_boss, y_boss;
 int hp_boss = 5;
+boolean colision_pj_boss = false;
 
 
 
@@ -177,20 +179,29 @@ void draw(){
         y_pj = mouseY;  
       }
       else if(controler == 0){
+        if (first_position)
+        {
+          x_pj = width / 2;
+          y_pj = height / 2;
+        }
         if (left){
           x_pj -= speed;
+          first_position = false;
           moved(); //call function on moved
         }
         if (right){
           x_pj += speed;
+          first_position = false;
           moved(); //call function on moved
         }
         if (up){
           y_pj -= speed;
+          first_position = false;
           moved(); //call function on moved
         }
         if (down){
           y_pj += speed;
+          first_position = false;
           moved(); //call function on moved
         } 
       }
@@ -421,14 +432,27 @@ void draw(){
          y_m2 = (1 - alfa_m2) * y_m2 + alfa_m2 * (y_pj - ofset_m2);  
       }
       
-      fill(255, 0, 0);
-      ellipse(x_boss,y_boss,size_boss*2,size_boss*2);
       
+      if (hp_boss > 0)
+      {
+        fill(255, 0, 0);
+        ellipse(x_boss,y_boss,size_boss*2,size_boss*2);
+      }
+
       alfa_boss = random(0.01, 0.0001); 
       
       x_boss = (1 - alfa_boss) * x_boss + alfa_boss * x_m2;
       y_boss = (1 - alfa_boss) * y_boss + alfa_boss * y_m2;
       
+      if (dist(x_boss, y_boss, x_pj, y_pj) < size_boss + size_pj) {
+          colision_pj_boss = true;
+          hp_boss -= 1;
+          break; // Sale del bucle si hay una colisión
+      }
+      else
+      {
+        colision_pj_boss = false;
+      }
       if (dist(x_boss, y_boss, x_m2, y_m2) < size_boss + size_m2 && millis() > startTime + attackTimer) {
               colisionDetectada_m2 = true;
               startTime = millis();
@@ -453,6 +477,10 @@ void draw(){
       
       if(colisionDetectada_m2){
         println("HAY COLISION CON M2");
+      }
+      if(colision_pj_boss)
+      {
+        println("HAY COLISION CON BOSS");
       }
       
   }
@@ -528,7 +556,7 @@ void gameplayInitialize(){
   {
     if (alfa_enemy[i] > 0)
     {
-      aux = int(random(1, 4));
+      aux = (int)random(1, 4);
       if(aux == 1)
       {
         x_e[i] = width/random(1,10);
@@ -555,8 +583,6 @@ void gameplayInitialize(){
        x_e[i] = width/random(1,10);
        y_e[i] = height/random(1,10);
     }
-    
-    
   }
   
   radio_enemy = 12;
