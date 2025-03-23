@@ -21,7 +21,11 @@ boolean startGame = false;
 
 ControlTimer pet_fear_timer;
 
-int startTime = 0;
+int startTimeM2 = 0;
+int attackTimerM2 = 2000;
+
+int startTimeBoss = 0;
+int attackTimerBoss = 1000;
 
 //Control
 
@@ -71,7 +75,7 @@ boolean colisionDetectada_m2 = false;
 boolean colisionDetectada_m2_pj = false;
 boolean distancia_e_m2[];
 
-int attackTimer = 2000;
+
 
 
 
@@ -90,7 +94,7 @@ float size_e[];
 
 // PowerUps
 int num_PwUp = 3;
-int num_PwDwn = 4;
+int num_PwDwn = 3;
 
 int left_powerUps = num_PwUp; // left powerups to start bossfight 
 
@@ -113,8 +117,8 @@ float pj_size_powerUp = 5; // 3
 // teleport
 
 //Position
-int x_portal = height/4;
-int y_portal = width/2;
+int x_portal;
+int y_portal;
 
 // size
 int portal_height = 20;
@@ -124,7 +128,7 @@ int portal_width = 60;
 float size_boss = 30;
 float alfa_boss;
 float x_boss, y_boss;
-int hp_boss = 5;
+int hp_boss = 10;
 boolean colision_pj_boss = false;
 
 
@@ -133,27 +137,7 @@ boolean colision_pj_boss = false;
 
 void setup(){
   size(_widthSetup,_heightSetup); //ventana
-  
-  gui(); // UI
-  
-  alfa_m1 = random(0.001,0.01);
-  alfa_m2 = random(0.001,0.01);
-  
-  radio_enemy = 12;
-  
-  // SetUp powerUps
-  for(int i = 0; i < num_PwUp; i++){
-      x_PwUp[i] = width/random(1, 10);// set random position
-      y_PwUp[i] = height/random(1, 10);
-      active_PwUp[i] = true;
-  }
-  
-  for(int i = 0; i < num_PwDwn; i++){
-      x_PwDwn[i] = width / random( 1, 10);// set random position
-      y_PwDwn[i] = height/random(1, 10);
-      active_PwDwn[i] = true;
-  }
-  
+  menuInitialize();
 }
 
 void draw(){
@@ -169,6 +153,8 @@ void draw(){
         deleteMenuGUI(); // delete UI
          
         gameplayInitialize(); // Initialize gameplay
+        
+        startGame = false; // set startGame to false 
       }
       break;
     case GAMEPLAY:
@@ -273,11 +259,11 @@ void draw(){
             colisionDetectada_m1 = false;
           }
           // Colisiones m2 con Enemys
-          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2 && millis() > startTime + attackTimer) {
+          if (dist(x_e[i], y_e[i], x_m2, y_m2) < radio_enemy + size_m2 && millis() > startTimeM2 + attackTimerM2) {
               colisionDetectada_m2 = true;
               
               
-              startTime = millis();
+              startTimeM2 = millis();
               
               hp_m2 -= 1;
 
@@ -427,8 +413,17 @@ void draw(){
       
       if (hp_boss > 0)
       {
-        fill(255, 0, 0);
+        if(millis() > startTimeBoss + attackTimerBoss){
+          fill(255, 0, 0);
+        }
+        else{
+          fill(255, 255, 0);
+        }
         ellipse(x_boss,y_boss,size_boss*2,size_boss*2);
+      }
+      else{
+        actualScene = Scenes.MENU;
+         menuInitialize();
       }
 
       alfa_boss = random(0.01, 0.0001); 
@@ -436,8 +431,9 @@ void draw(){
       x_boss = (1 - alfa_boss) * x_boss + alfa_boss * x_m2;
       y_boss = (1 - alfa_boss) * y_boss + alfa_boss * y_m2;
       
-      if (dist(x_boss, y_boss, x_pj, y_pj) < size_boss + size_pj) {
+      if (dist(x_boss, y_boss, x_pj, y_pj) < size_boss + size_pj && millis() > startTimeBoss + attackTimerBoss) {
           colision_pj_boss = true;
+          startTimeBoss = millis();
           hp_boss -= 1;
           break; // Sale del bucle si hay una colisión
       }
@@ -445,9 +441,9 @@ void draw(){
       {
         colision_pj_boss = false;
       }
-      if (dist(x_boss, y_boss, x_m2, y_m2) < size_boss + size_m2 && millis() > startTime + attackTimer) {
+      if (dist(x_boss, y_boss, x_m2, y_m2) < size_boss + size_m2 && millis() > startTimeM2 + attackTimerM2) {
               colisionDetectada_m2 = true;
-              startTime = millis();
+              startTimeM2 = millis();
               hp_m2 -= 1;
               println(hp_m2);
       }
@@ -538,11 +534,10 @@ void gameplayInitialize(){
   y_m1 = 0;
   x_m2 = width/random(1,10);
   y_m2 = height/random(1,10);
-  
   alfa_m1 = random(0.001,0.1);
   alfa_m2 = random(0.001,0.1);
   
-  int aux;
+ 
   
   for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
         if (i < num_e / 2) { 
@@ -562,7 +557,7 @@ void gameplayInitialize(){
     if (alfa_enemy[i] > 0)
     {
       
-      aux = (int)random(1, 4);
+      int aux = (int)random(1, 4);
       if(aux == 1)
       {
         x_e[i] = width/random(1,10);
@@ -599,16 +594,51 @@ void gameplayInitialize(){
     hp_e[i] = 1;
   }
   
+  // initialize powerUps
+  for(int i = 0; i < num_PwUp; i++){
+      x_PwUp[i] = width/random(1, 10);// set random position
+      y_PwUp[i] = height/random(1, 10);
+      active_PwUp[i] = true;
+  }
+  
+  for(int i = 0; i < num_PwDwn; i++){
+      x_PwDwn[i] = width / random( 1, 10);// set random position
+      y_PwDwn[i] = height/random(1, 10);
+      active_PwDwn[i] = true;
+  }
+  
+  left_powerUps = num_PwUp;
+  
   // initialize timers
   
   pet_fear_timer = new ControlTimer();
   pet_fear_timer.setSpeedOfTime(1); // speed of the timer
+  
+  
+  // set booleans to false
+  
+  colisionDetectada = false;
+  colisionDetectada_m1 = false;
+  colisionDetectada_m2 = false;
+  colisionDetectada_m2_pj = false;
+  
+  
+  // portal initialize
+  x_portal = height/2;
+  y_portal = width/4;
 }
 
 void bossInitialize()
 {
   x_boss = width/2;//random position
   y_boss = width/2;
+  
+  hp_boss = 10;
+}
+
+void menuInitialize(){
+     
+  gui(); // initialize UI
 }
 
 void moved(){
