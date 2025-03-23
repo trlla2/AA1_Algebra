@@ -179,27 +179,29 @@ void draw(){
         y_pj = mouseY;  
       }
       else if(controler == 0){
+        
         if (first_position)
         {
           x_pj = width / 2;
           y_pj = height / 2;
         }
-        if (left && x_pj < 0){ // go left and dont go off de screen
+        println(x_pj < 0);
+        if (left && x_pj > 0){ // go left and dont go off de screen
           x_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (right && x_pj > width){ // go right and dont go off de screen
+        if (right && x_pj < width){ // go right and dont go off de screen
           x_pj += speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (up && y_pj < 0){ // go up and dont go off de screen
+        if (up && y_pj > 0){ // go up and dont go off de screen
           y_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (down && y_pj > height){ // go down and dont go off de screen
+        if (down && y_pj < height){ // go down and dont go off de screen
           y_pj += speed;
           first_position = false;
           moved(); //call function on moved
