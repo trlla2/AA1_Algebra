@@ -188,7 +188,7 @@ void draw(){
       // ----- pj
       // set position pj
       if(controler == 1){ // control reton
-        if(!checkWallColisoin(mouseX,mouseY)){
+        if(!checkWallColisoin(mouseX,mouseY, size_pj)){
           x_pj = mouseX;
           y_pj = mouseY;
         }
@@ -201,22 +201,22 @@ void draw(){
           y_pj = height / 2;
         }
         println(x_pj < 0);
-        if (left && x_pj > 0  || !checkWallColisoin(x_pj - speed,y_pj)){ // go left and dont go off de screen and colision with walls
+        if (left && x_pj > 0  || !checkWallColisoin(x_pj - speed,y_pj, size_pj)){ // go left and dont go off de screen and colision with walls
           x_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (right && x_pj < width || !checkWallColisoin(x_pj + speed,y_pj)){ // go right and dont go off de screen and colision with walls
+        if (right && x_pj < width || !checkWallColisoin(x_pj + speed,y_pj, size_pj)){ // go right and dont go off de screen and colision with walls
           x_pj += speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (up && y_pj > 0 || !checkWallColisoin(x_pj,y_pj - speed)){ // go up and dont go off de screen and colision with walls
+        if (up && y_pj > 0 || !checkWallColisoin(x_pj,y_pj - speed, size_pj)){ // go up and dont go off de screen and colision with walls
           y_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (down && y_pj < height || !checkWallColisoin(x_pj,y_pj + speed)){ // go down and dont go off de screen and colision with walls
+        if (down && y_pj < height || !checkWallColisoin(x_pj,y_pj + speed, size_pj)){ // go down and dont go off de screen and colision with walls
           y_pj += speed;
           first_position = false;
           moved(); //call function on moved
@@ -863,19 +863,13 @@ void moved(){
   
 }
 
-boolean checkWallColisoin(float x , float y){
+boolean checkWallColisoin(float x , float y, float size){
   // Calcular límites del jugador
-     float PJ_left = x - size_pj/2;
-     float PJ_right = x + size_pj/2;
-     float PJ_top = y - size_pj/2;
-     float PJ_bottom = y + size_pj/2;
-     
-     float M2_left = x - size_m2/2;
-     float M2_right = x + size_m2/2;
-     float M2_top = y - size_m2/2;
-     float M2_bottom = y + size_m2/2;
-     
-    
+     float PJ_left = x - size/2;
+     float PJ_right = x + size/2;
+     float PJ_top = y - size/2;
+     float PJ_bottom = y + size/2;
+ 
     for(int i = 0; i < num_wall; i++){
       // Calcular límites del muro
       float wall_left = walls[i].x - width_wall/2;
@@ -888,13 +882,6 @@ boolean checkWallColisoin(float x , float y){
          PJ_left < wall_right && 
          PJ_bottom > wall_top && 
          PJ_top < wall_bottom) {
-         println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
-         return true;
-      }
-      else if(M2_right > wall_left && 
-         M2_left < wall_right && 
-         M2_bottom > wall_top && 
-         M2_top < wall_bottom) {
          println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
          return true;
       }
