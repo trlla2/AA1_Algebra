@@ -27,6 +27,14 @@ int startTime = 0;
 
 int controler = 1; // 1 - para raton 0 - for teclado
 
+// control teclado
+float speed = 15; // speed of keyboard movement
+boolean up = false;
+boolean down = false;
+boolean left = false;
+boolean right = false;
+
+
 // PJ
 float x_pj,y_pj; // position
 //Color
@@ -162,8 +170,29 @@ void draw(){
     case GAMEPLAY:
         // ----- pj
       // set position pj
-      x_pj = mouseX;
-      y_pj = mouseY;
+      if(controler == 1){ // control reton
+        x_pj = mouseX;
+        y_pj = mouseY;  
+      }
+      else if(controler == 0){
+        if (left){
+          x_pj -= speed;
+          moved(); //call function on moved
+        }
+        if (right){
+          x_pj += speed;
+          moved(); //call function on moved
+        }
+        if (up){
+          y_pj -= speed;
+          moved(); //call function on moved
+        }
+        if (down){
+          y_pj += speed;
+          moved(); //call function on moved
+        } 
+      }
+      
       // draw
       fill(0,255,0);
       ellipse(x_pj,y_pj,size_pj*2,size_pj*2);  
@@ -340,6 +369,42 @@ void mouseMoved(){ // on mouse moved
   }
 }
 
+void keyPressed() { // on any key pressed
+  if (key == CODED) {
+    if (keyCode == LEFT) {
+      left = true;
+    }
+    else if (keyCode == RIGHT) {
+      right = true;
+    }
+    else if (keyCode == UP) {
+      up = true;
+    }
+    else if (keyCode == DOWN){
+      down = true;
+    }
+  }
+  
+  
+}
+
+void keyReleased() { // on any key released
+  if (key == CODED) {
+    if (keyCode == LEFT) {
+      left = false;
+    }
+    else if (keyCode == RIGHT) {
+      right = false;
+    }
+    else if (keyCode == UP) {
+      up = false;
+    }
+    else if (keyCode == DOWN){
+      down = false;
+    }
+  }
+}
+
 // -------- GAMEPLAY Functions
 
 void gameplayInitialize(){
@@ -386,6 +451,8 @@ void gameplayInitialize(){
   pet_fear_timer = new ControlTimer();
   pet_fear_timer.setSpeedOfTime(1); // speed of the timer
 }
+
+
 
 void moved(){
   if(colisionDetectada_m2_pj){// if player got de second pet 
