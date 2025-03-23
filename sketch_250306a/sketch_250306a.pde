@@ -24,6 +24,9 @@ ControlTimer pet_fear_timer;
 int startTimeM2 = 0;
 int attackTimerM2 = 2000;
 
+int startTimeM1 = 0;
+int attackTimerM1 = 2000;
+
 int startTimeBoss = 0;
 int attackTimerBoss = 1000;
 
@@ -149,6 +152,9 @@ float alfa_boss;
 float x_boss, y_boss;
 int hp_boss = 10;
 boolean colision_pj_boss = false;
+
+// SCORE
+int score = 0;
 
 
 
@@ -315,6 +321,7 @@ void draw(){
           if (dist(x_e[i], y_e[i], x_pj, y_pj) < radio_enemy + size_pj) {
               colisionDetectada = true;
               hp_e[i] -= 1;
+              score++;
               break; // Sale del bucle si hay una colisión
           }
           else
@@ -517,6 +524,7 @@ void draw(){
       
       if (dist(x_boss, y_boss, x_pj, y_pj) < size_boss + size_pj && millis() > startTimeBoss + attackTimerBoss) {
           colision_pj_boss = true;
+          score++;
           startTimeBoss = millis();
           hp_boss -= 1;
           break; // Sale del bucle si hay una colisión
@@ -530,6 +538,18 @@ void draw(){
               startTimeM2 = millis();
               hp_m2 -= 1;
               println(hp_m2);
+      }
+      else
+      {
+         colisionDetectada_m2 = false;
+      }
+      
+      if (dist(x_boss, y_boss, x_m1, y_m1) < size_boss + size_m1 && millis() > startTimeM1 + attackTimerM1) {
+              colisionDetectada_m1 = true;
+              startTimeM1 = millis();
+              hp_boss -= 1;
+              score++;
+              println(hp_boss);
       }
       else
       {
@@ -749,6 +769,7 @@ void moved(){
            
          if(module_distance <= radio_PwUps * 2){ // if they colision
             println("collision true");
+            score++;
             
             switch(i){
               case 1:
@@ -849,6 +870,11 @@ boolean checkWallColisoin(float x , float y){
      float PJ_top = y - size_pj/2;
      float PJ_bottom = y + size_pj/2;
      
+     float M2_left = x - size_m2/2;
+     float M2_right = x + size_m2/2;
+     float M2_top = y - size_m2/2;
+     float M2_bottom = y + size_m2/2;
+     
     
     for(int i = 0; i < num_wall; i++){
       // Calcular límites del muro
@@ -864,7 +890,13 @@ boolean checkWallColisoin(float x , float y){
          PJ_top < wall_bottom) {
          println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
          return true;
-        
+      }
+      else if(M2_right > wall_left && 
+         M2_left < wall_right && 
+         M2_bottom > wall_top && 
+         M2_top < wall_bottom) {
+         println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
+         return true;
       }
    }
   return false;
