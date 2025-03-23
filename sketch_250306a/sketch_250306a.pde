@@ -27,6 +27,9 @@ int attackTimerM2 = 2000;
 int startTimeBoss = 0;
 int attackTimerBoss = 1000;
 
+int lastSpawnTime = 0;
+int lastSpawnTimer = 2000;
+
 //Control
 
 int controler = 1; // 1 - para raton 0 - for teclado
@@ -76,9 +79,6 @@ boolean colisionDetectada_m2_pj = false;
 boolean distancia_e_m2[];
 
 
-
-
-
 // PNJs (Enemigos)
 int num_e; // numero de enemigos
 float alfa_enemy[];
@@ -91,6 +91,10 @@ int hp_e[];
 
 // size
 float size_e[];
+
+int num_spawn_e = 0;
+
+
 
 // PowerUps
 int num_PwUp = 3;
@@ -203,6 +207,50 @@ void draw(){
       x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
       y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
       
+      // Spawn Enemyes
+      if (millis() > lastSpawnTime + lastSpawnTimer && num_spawn_e < num_e){
+        println("Spawnean");
+        lastSpawnTime = millis();
+        if (alfa_enemy[num_spawn_e] > 0)
+        {
+          int aux = (int)random(1, 4);
+          if(aux == 1)
+          {
+            println("1");
+            x_e[num_spawn_e] = width/random(1,10);
+            y_e[num_spawn_e] = -10;
+          }
+          else if(aux == 2)
+          {
+            println("2");
+            x_e[num_spawn_e] = width/random(1,10);
+            y_e[num_spawn_e] = height + 10;
+          }
+          else if(aux == 3)
+          {
+            println("3");
+            x_e[num_spawn_e] = -10;
+            y_e[num_spawn_e] = height/random(1,10);
+          }
+          else
+          {
+            println("4");
+            x_e[num_spawn_e] = width + 10;
+            y_e[num_spawn_e] = height/random(1,10);
+          }
+        }
+        num_spawn_e++;
+    }
+    
+    for (int i = 0; i < num_e; i++) {
+          if (hp_e[i] > 0)
+          {
+            fill(255,0,0);
+            ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
+          }
+          
+      }
+      
       
       // Perseguir de los enemigos
        for(int i = 0; i < num_e; i++){ //iterar entre todos los pnj
@@ -227,15 +275,7 @@ void draw(){
       ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
       fill(90,255,200);
       ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
-      
-      for (int i = 0; i < num_e; i++) {
-          if (hp_e[i] > 0)
-          {
-            fill(255,0,0);
-            ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
-          }
-          
-      }
+
       
       for (int i = 0; i < num_e; i++) {
         if (hp_e[i] > 0){
@@ -559,41 +599,17 @@ void gameplayInitialize(){
             alfa_enemy[i] = random(0.01, 0.0001);
         }
    }
-  
-  for(int i = 0; i < num_e; i++)
-  {
+
+    for (int i = 0; i < num_e; i++)
+    {
+      if(alfa_enemy[num_spawn_e] < 0){
+         println("Huyen");
+         x_e[num_spawn_e] = width/random(1,10);
+         y_e[num_spawn_e] = height/random(1,10);
+      }
+    }
     
-    if (alfa_enemy[i] > 0)
-    {
-      
-      int aux = (int)random(1, 4);
-      if(aux == 1)
-      {
-        x_e[i] = width/random(1,10);
-        y_e[i] = -10;
-      }
-      else if(aux == 2)
-      {
-        x_e[i] = width/random(1,10);
-        y_e[i] = height + 10;
-      }
-      else if(aux == 3)
-      {
-        x_e[i] = -10;
-        y_e[i] = height/random(1,10);
-      }
-      else
-      {
-        x_e[i] = width + 10;
-        y_e[i] = height/random(1,10);
-      }
-    }
-    else
-    {
-       x_e[i] = width/random(1,10);
-       y_e[i] = height/random(1,10);
-    }
-  }
+  
   
   radio_enemy = 12;
   
