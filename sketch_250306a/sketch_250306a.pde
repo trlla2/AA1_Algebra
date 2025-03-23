@@ -30,6 +30,11 @@ int attackTimerBoss = 1000;
 int lastSpawnTime = 0;
 int lastSpawnTimer = 2000;
 
+int GameplayTime = 0;
+int GameplayHurtTime = 60000;
+int GameplayTimer = 0;
+
+
 //Control
 
 int controler = 1; // 1 - para raton 0 - for teclado
@@ -64,6 +69,10 @@ int ofset_m2 = 50;
 //size (los dos con el mismo size)
 float size_m1 = 11;
 float size_m2 = 13;
+
+float size_width_healthbar_m2 = 30;
+float size_height_healthbar_m2 = 10;
+float offset_healthbar_m2 = 5;
 
 float alfa_m1;
 float alfa_m2;
@@ -118,8 +127,14 @@ float m_speed_powerUp = 0.03; // 1
 float m_size_powerUp = 3; // 2
 float pj_size_powerUp = 5; // 3
 
-// teleport
+//walls
+PVector[] walls; 
+static int num_wall = 10;
+int height_wall =  20;
+int width_wall = 20;
 
+
+// Portal
 //Position
 int x_portal;
 int y_portal;
@@ -162,11 +177,15 @@ void draw(){
       }
       break;
     case GAMEPLAY:
+      timer();
+    
       // ----- pj
       // set position pj
       if(controler == 1){ // control reton
-        x_pj = mouseX;
-        y_pj = mouseY;  
+        if(!checkWallColisoin(mouseX,mouseY)){
+          x_pj = mouseX;
+          y_pj = mouseY;
+        }
       }
       else if(controler == 0){
         
@@ -176,22 +195,22 @@ void draw(){
           y_pj = height / 2;
         }
         println(x_pj < 0);
-        if (left && x_pj > 0){ // go left and dont go off de screen
+        if (left && x_pj > 0  || !checkWallColisoin(x_pj - speed,y_pj)){ // go left and dont go off de screen and colision with walls
           x_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (right && x_pj < width){ // go right and dont go off de screen
+        if (right && x_pj < width || !checkWallColisoin(x_pj + speed,y_pj)){ // go right and dont go off de screen and colision with walls
           x_pj += speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (up && y_pj > 0){ // go up and dont go off de screen
+        if (up && y_pj > 0 || !checkWallColisoin(x_pj,y_pj - speed)){ // go up and dont go off de screen and colision with walls
           y_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (down && y_pj < height){ // go down and dont go off de screen
+        if (down && y_pj < height || !checkWallColisoin(x_pj,y_pj + speed)){ // go down and dont go off de screen and colision with walls
           y_pj += speed;
           first_position = false;
           moved(); //call function on moved
@@ -276,7 +295,19 @@ void draw(){
       ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
       fill(90,255,200);
       ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
-
+      
+      // helathbar mascota 2
+      rectMode(CENTER);  
+      fill(255,0,0);  
+      size_width_healthbar_m2 = hp_m2 * 10;
+      rect(x_m2 , y_m2 - (size_m2*2) + offset_healthbar_m2, size_width_healthbar_m2,  size_height_healthbar_m2);
+      
+      // Draw walls
+      for(int i = 0; i < num_wall; i++){
+        rectMode(CENTER);  // pinta los muros a partir del punto central, el alto y el ancho
+        fill(127);  // Set fill to white
+        rect(walls[i].x, walls[i].y, height_wall, width_wall); // Draw white rect using CORNER mode
+      }
       
       for (int i = 0; i < num_e; i++) {
         if (hp_e[i] > 0){
@@ -307,6 +338,8 @@ void draw(){
               startTimeM2 = millis();
               
               hp_m2 -= 1;
+              
+               
 
               break; // Sale del bucle si hay una colisión
           }
@@ -410,7 +443,7 @@ void draw(){
       
       break;
       case BOSS:
-      
+      timer();
       // ----- pj
       // set position pj
       if(controler == 1){ // control reton
@@ -448,6 +481,12 @@ void draw(){
       ellipse(x_m1,y_m1,size_m1*2,size_m1*2);
       fill(90,255,200);
       ellipse(x_m2,y_m2,size_m2*2,size_m2*2);
+      
+      // helathbar mascota 2
+      rectMode(CENTER);  
+      fill(255,0,0);  
+      size_width_healthbar_m2 = hp_m2 * 10;
+      rect(x_m2 , y_m2 - (size_m2*2) + offset_healthbar_m2, size_width_healthbar_m2,  size_height_healthbar_m2);
       
       if (colisionDetectada_m2_pj)
       {
@@ -566,10 +605,26 @@ void keyReleased() { // on any key released
     }
   }
 }
+void bossInitialize()
+{
+  x_boss = width/2;//random position
+  y_boss = width/2;
+  
+  hp_boss = 10;
+}
+
+void menuInitialize(){
+     
+  gui(); // initialize UI
+}
 
 // -------- GAMEPLAY Functions
 
 void gameplayInitialize(){
+  // reset timer
+  GameplayTime = millis();
+  GameplayTimer = 0;
+  
   // initialize arrays
   
   alfa_enemy = new float [num_e];
@@ -587,6 +642,8 @@ void gameplayInitialize(){
   alfa_m1 = random(0.001,0.1);
   alfa_m2 = random(0.001,0.1);
   
+  size_width_healthbar_m2 = 30;
+  
   hp_pj = 3;
   
   for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
@@ -603,10 +660,10 @@ void gameplayInitialize(){
 
     for (int i = 0; i < num_e; i++)
     {
-      if(alfa_enemy[num_spawn_e] < 0){
+      if(alfa_enemy[i] < 0){
          println("Huyen");
-         x_e[num_spawn_e] = width/random(1,10);
-         y_e[num_spawn_e] = height/random(1,10);
+         x_e[num_spawn_e] = random(0,width);
+         y_e[num_spawn_e] = random(0,height);
       }
     }
     
@@ -622,14 +679,14 @@ void gameplayInitialize(){
   
   // initialize powerUps
   for(int i = 0; i < num_PwUp; i++){
-      x_PwUp[i] = width/random(1, 10);// set random position
-      y_PwUp[i] = height/random(1, 10);
+      x_PwUp[i] = random(0,width);// set random position
+      y_PwUp[i] = random(0,height);
       active_PwUp[i] = true;
   }
   
   for(int i = 0; i < num_PwDwn; i++){
-      x_PwDwn[i] = width / random( 1, 10);// set random position
-      y_PwDwn[i] = height/random(1, 10);
+      x_PwDwn[i] = random(0,width);// set random position
+      y_PwDwn[i] = random(0,height);
       active_PwDwn[i] = true;
   }
   
@@ -652,19 +709,31 @@ void gameplayInitialize(){
   // portal initialize
   x_portal = height/2;
   y_portal = width/4;
-}
-
-void bossInitialize()
-{
-  x_boss = width/2;//random position
-  y_boss = width/2;
   
-  hp_boss = 10;
+  // wall initialize
+  walls = new PVector[num_wall]; 
+  
+  for(int i = 0; i < num_wall; i++){
+    walls[i] = new PVector( // random position
+      (int)random(0 + width_wall,width - width_wall),
+      (int)random(0 + height_wall,height - height_wall)
+    ); 
+  }
 }
 
-void menuInitialize(){
-     
-  gui(); // initialize UI
+void timer(){
+  GameplayTimer = int((millis() - GameplayTime) / 1000);
+  
+  if(GameplayTimer >= GameplayHurtTime){
+    GameplayTime = millis();
+    hp_pj --;
+  }
+  
+  PFont font;
+  font = createFont("Roboto-VariableFont_wdth,wght.ttf", 20);
+  fill(255);
+  textFont(font);
+  text(GameplayTimer, width/2, height/10);
 }
 
 void moved(){
@@ -741,33 +810,64 @@ void moved(){
            break;
          }
       }
-        
+     
     }
+    if(actualScene == Scenes.GAMEPLAY){
+      // portal position
+      // Calcular límites del jugador
+      float PJ_left = x_pj - size_pj/2;
+      float PJ_right = x_pj + size_pj/2;
+      float PJ_top = y_pj - size_pj/2;
+      float PJ_bottom = y_pj + size_pj/2;
+      
     
-    // portal position
-    // Calcular límites del jugador
-    float PJ_left = x_pj - size_pj/2;
-    float PJ_right = x_pj + size_pj/2;
-    float PJ_top = y_pj - size_pj/2;
-    float PJ_bottom = y_pj + size_pj/2;
-    
+      // Calcular límites del muro
+      float wall_left = x_portal - portal_width/2;
+      float wall_right = x_portal + portal_width/2;
+      float wall_top = y_portal - portal_height/2;
+      float wall_bottom = y_portal + portal_height/2;
   
-    // Calcular límites del muro
-    float wall_left = x_portal - portal_width/2;
-    float wall_right = x_portal + portal_width/2;
-    float wall_top = y_portal - portal_height/2;
-    float wall_bottom = y_portal + portal_height/2;
+      // Detección AABB correcta
+      if(PJ_right > wall_left && 
+         PJ_left < wall_right && 
+         PJ_bottom > wall_top && 
+         PJ_top < wall_bottom && left_powerUps <= 0) {
+        println("enter portal");
+        actualScene = Scenes.BOSS; //set GAMEPLAY scene
+        bossInitialize();
+      }
+     }
+  }
+  
+  
+}
 
-    // Detección AABB correcta
-    if(PJ_right > wall_left && 
-       PJ_left < wall_right && 
-       PJ_bottom > wall_top && 
-       PJ_top < wall_bottom && left_powerUps <= 0) {
-      println("enter portal");
-      actualScene = Scenes.BOSS; //set GAMEPLAY scene
-      bossInitialize();
-    }
+boolean checkWallColisoin(float x , float y){
+  // Calcular límites del jugador
+     float PJ_left = x - size_pj/2;
+     float PJ_right = x + size_pj/2;
+     float PJ_top = y - size_pj/2;
+     float PJ_bottom = y + size_pj/2;
+     
+    
+    for(int i = 0; i < num_wall; i++){
+      // Calcular límites del muro
+      float wall_left = walls[i].x - width_wall/2;
+      float wall_right = walls[i].x + width_wall/2;
+      float wall_top = walls[i].y - height_wall/2;
+      float wall_bottom = walls[i].y + height_wall/2;
+      
+      // Detección AABB correcta
+      if(PJ_right > wall_left && 
+         PJ_left < wall_right && 
+         PJ_bottom > wall_top && 
+         PJ_top < wall_bottom) {
+         println("collision muro: " + i + "posicion del muro: " + walls[i].x + " ," + walls[i].y);
+         return true;
+        
+      }
    }
+  return false;
 }
 
 // -------- UI Functions
