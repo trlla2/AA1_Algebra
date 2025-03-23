@@ -184,22 +184,22 @@ void draw(){
           x_pj = width / 2;
           y_pj = height / 2;
         }
-        if (left){
+        if (left && x_pj < 0){ // go left and dont go off de screen
           x_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (right){
+        if (right && x_pj > width){ // go right and dont go off de screen
           x_pj += speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (up){
+        if (up && y_pj < 0){ // go up and dont go off de screen
           y_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (down){
+        if (down && y_pj > height){ // go down and dont go off de screen
           y_pj += speed;
           first_position = false;
           moved(); //call function on moved
@@ -210,17 +210,7 @@ void draw(){
       fill(0,255,0);
       ellipse(x_pj,y_pj,size_pj*2,size_pj*2);  
       
-      for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
-        if (i < num_e / 2) { 
-            alfa_enemy[i] = random(-0.01, -0.0001); 
-            
-        } else if (i < 3 * num_e / 4) { 
-            alfa_enemy[i] = random(0.01, 0.0001);
-            
-        } else { 
-            alfa_enemy[i] = random(0.01, 0.0001);
-        }
-      }
+      
       // Perseguir mascota 1
       x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
       y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
@@ -299,7 +289,7 @@ void draw(){
           if(hp_m2 <= 0)
           {
             hp_pj -= 1;
-            println(hp_pj);
+            //println(hp_pj);
           }
           if (hp_m2 <= 0)
           {
@@ -308,7 +298,7 @@ void draw(){
         }
       }
       
-      println(hp_m2);
+      //println(hp_m2);
       
       if (dist(x_m2, y_m2, x_pj, y_pj) < size_m2 + size_pj)
       {
@@ -552,10 +542,24 @@ void gameplayInitialize(){
   
   int aux;
   
+  for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
+        if (i < num_e / 2) { 
+            alfa_enemy[i] = random(-0.01, -0.0001); 
+            
+        } else if (i < 3 * num_e / 4) { 
+            alfa_enemy[i] = random(0.01, 0.0001);
+            
+        } else { 
+            alfa_enemy[i] = random(0.01, 0.0001);
+        }
+   }
+  
   for(int i = 0; i < num_e; i++)
   {
+    
     if (alfa_enemy[i] > 0)
     {
+      
       aux = (int)random(1, 4);
       if(aux == 1)
       {
