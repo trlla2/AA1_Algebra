@@ -210,9 +210,10 @@ void draw(){
       // Spawn Enemyes
       if (millis() > lastSpawnTime + lastSpawnTimer && num_spawn_e < num_e){
         println("Spawnean");
-        lastSpawnTime = millis();
+        
         if (alfa_enemy[num_spawn_e] > 0)
         {
+          lastSpawnTime = millis();
           int aux = (int)random(1, 4);
           if(aux == 1)
           {
