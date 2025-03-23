@@ -278,6 +278,10 @@ void draw(){
           {
             hp_pj -= 1;
             //println(hp_pj);
+            if(hp_pj <= 0){
+              actualScene = Scenes.MENU; // go to menu
+              menuInitialize();
+            }
           }
           if (hp_m2 <= 0)
           {
@@ -458,6 +462,11 @@ void draw(){
         println(hp_pj);
       }
       
+      if(hp_pj <= 0){
+        actualScene = Scenes.MENU; // go to menu
+        menuInitialize();
+      }
+      
       if (hp_m2 <= 0)
       {
         hp_m2 = 3;
@@ -537,7 +546,7 @@ void gameplayInitialize(){
   alfa_m1 = random(0.001,0.1);
   alfa_m2 = random(0.001,0.1);
   
- 
+  hp_pj = 3;
   
   for (int i = 0; i < num_e; i++) { // Iterar entre todos los enemigos
         if (i < num_e / 2) { 
