@@ -1,7 +1,7 @@
 // Primera practica de algebra lineal
 import controlP5.*;
 
-
+int a = 0;
 //------------------------ Variables 
 // Setup Ventana
 int _widthSetup = 600; // varables con _ pq si no la funcion size() no le mola 
@@ -31,7 +31,7 @@ int startTimeBoss = 0;
 int attackTimerBoss = 1000;
 
 int lastSpawnTime = 0;
-int lastSpawnTimer = 2000;
+int lastSpawnTimer = 1000;
 
 int GameplayTime = 0;
 int GameplayHurtTime = 60000;
@@ -98,16 +98,16 @@ boolean distancia_e_m2[];
 
 // PNJs (Enemigos)
 int num_e; // numero de enemigos
-float alfa_enemy[];
+float[] alfa_enemy;
 int radio_enemy;
 //position
-float x_e[];
-float y_e[];
+float[] x_e;
+float[] y_e;
 
-int hp_e[];
+int []hp_e;
 
 // size
-float size_e[];
+float[] size_e;
 
 int num_spawn_e = 0;
 
@@ -239,9 +239,10 @@ void draw(){
          x_m1 = (1 - alfa_m1) * x_m1 + alfa_m1 * (x_pj + ofset_m1);
          y_m1 = (1 - alfa_m1) * y_m1 + alfa_m1 * y_pj;
       }
+      
       // Spawn Enemyes
       if (millis() > lastSpawnTime + lastSpawnTimer && num_spawn_e < num_e){
-        println("Spawnean");
+        
         
         if (alfa_enemy[num_spawn_e] > 0)
         {
@@ -252,32 +253,43 @@ void draw(){
             println("1");
             x_e[num_spawn_e] = width/random(1,10);
             y_e[num_spawn_e] = -10;
+
+            hp_e[num_spawn_e] = 1;
           }
           else if(aux == 2)
           {
             println("2");
             x_e[num_spawn_e] = width/random(1,10);
             y_e[num_spawn_e] = height + 10;
+
+            hp_e[num_spawn_e] = 1;
           }
           else if(aux == 3)
           {
             println("3");
             x_e[num_spawn_e] = -10;
             y_e[num_spawn_e] = height/random(1,10);
+
+            hp_e[num_spawn_e] = 1;
           }
           else
           {
             println("4");
             x_e[num_spawn_e] = width + 10;
             y_e[num_spawn_e] = height/random(1,10);
+
+            hp_e[num_spawn_e] = 1;
           }
         }
+        a = num_spawn_e;
+        
         num_spawn_e++;
     }
     
     for (int i = 0; i < num_e; i++) {
           if (hp_e[i] > 0)
           {
+            
             fill(255,0,0);
             ellipse(x_e[i], y_e[i], radio_enemy * 2, radio_enemy * 2);
           }
@@ -703,11 +715,12 @@ void gameplayInitialize(){
   
   alfa_enemy = new float [num_e];
   x_e = new float [num_e];
+  println(x_e.length);
   y_e = new float [num_e];
   size_e = new float[num_e];
   hp_e = new int[num_e];
   distancia_e_m2 = new boolean[num_e];
-  
+  num_spawn_e = 0;
   
   x_m1 = width/2;//random position
   y_m1 = 0;
@@ -735,9 +748,9 @@ void gameplayInitialize(){
     for (int i = 0; i < num_e; i++)
     {
       if(alfa_enemy[i] < 0){
-         println("Huyen");
-         x_e[num_spawn_e] = random(0,width);
-         y_e[num_spawn_e] = random(0,height);
+         x_e[i] = random(0,width);
+         y_e[i] = random(0,height);
+         num_spawn_e ++;
       }
     }
     
