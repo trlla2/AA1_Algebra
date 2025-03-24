@@ -205,23 +205,23 @@ void draw(){
           x_pj = width / 2;
           y_pj = height / 2;
         }
-        println(x_pj < 0);
-        if (left && x_pj > 0  || !checkWallColisoin(x_pj - speed,y_pj, size_pj)){ // go left and dont go off de screen and colision with walls
+        println(right && x_pj < width );
+        if (left && x_pj > 0  && !checkWallColisoin(x_pj - speed,y_pj, size_pj)){ // go left and dont go off de screen and colision with walls
           x_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (right && x_pj < width || !checkWallColisoin(x_pj + speed,y_pj, size_pj)){ // go right and dont go off de screen and colision with walls
+        if (right && x_pj < width && !checkWallColisoin(x_pj + speed,y_pj, size_pj)){ // go right and dont go off de screen and colision with walls
           x_pj += speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (up && y_pj > 0 || !checkWallColisoin(x_pj,y_pj - speed, size_pj)){ // go up and dont go off de screen and colision with walls
+        if (up && y_pj > 0 && !checkWallColisoin(x_pj,y_pj - speed, size_pj)){ // go up and dont go off de screen and colision with walls
           y_pj -= speed;
           first_position = false;
           moved(); //call function on moved
         }
-        if (down && y_pj < height || !checkWallColisoin(x_pj,y_pj + speed, size_pj)){ // go down and dont go off de screen and colision with walls
+        if (down && y_pj < height && !checkWallColisoin(x_pj,y_pj + speed, size_pj)){ // go down and dont go off de screen and colision with walls
           y_pj += speed;
           first_position = false;
           moved(); //call function on moved
